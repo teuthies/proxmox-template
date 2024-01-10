@@ -13,5 +13,7 @@ Based on Techno Tim Tutorial https://technotim.live/posts/cloud-init-cloud-image
 Choose your Ubuntu Cloud Image https://cloud-images.ubuntu.com/
 or Debian Cloud Image https://cloud.debian.org/images/cloud/
 
-Download Cloud Image (replace with the url of the one you chose from above)
+Download Cloud Image (replace with the url of the one you chose from above):
+```
 wget https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img
+```
