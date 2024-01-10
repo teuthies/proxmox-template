@@ -1,13 +1,23 @@
 #!/bin/bash
 set -o errexit
 
+
+# default settings which are used for the templates
+MEMORY=4096
+BRIDGE=vmbr1
+VLANID=11
+BIOS=ovmf
+MACHINE=q35
+CORE=4
+STORAGE=local-lvm
+
 printf "* Available templates to generate:\n 1) Ubuntu Server 22.04 LTS (Jammy Jellyfish)\n 2) Debian 12 (Bokkworm)\n\n"
 read -p "* Enter number of distro to use: " OSNR
 
 case $OSNR in
 
   1)
-    OSNAME=ubuntu2204
+    OSNAME=ubuntu
     VMID_DEFAULT=8100
     read -p "Enter a VM ID for $OSNAME [$VMID_DEFAULT]: " VMID
     VMID=${VMID:-$VMID_DEFAULT}
@@ -18,7 +28,7 @@ case $OSNR in
     ;;
 
   2)
-    OSNAME=debian12
+    OSNAME=debian
     VMID_DEFAULT=8200
     read -p "Enter a VM ID for $OSNAME [$VMID_DEFAULT]: " VMID
     VMID=${VMID:-$VMID_DEFAULT}
@@ -33,3 +43,24 @@ case $OSNR in
     exit 0
     ;;
 esac
+
+printf "\n** Creating a VM with $MEMORY MB using network bridge $BRIDGE\n"
+qm create $VMID --name $OSNAME-cloud --memory $MEMORY --net0 virtio,bridge=$BRIDGE,trunks=$VLANID --core $CORE --machine $MACHINE --bios $BIOS 
+
+printf "\n** Importing the disk in qcow2 format (as 'Unused Disk 0')\n"
+qm importdisk $VMID /tmp/$VMIMAGE $STORAGE
+
+printf "\n** Attaching the disk to the vm using VirtIO SCSI\n"
+qm set $VMID --scsihw virtio-scsi-pci --scsi0 $STORAGE:vm-$VMID-disk-0
+
+printf "\n** Creating a cloudinit drive managed by Proxmox\n"
+qm set $VMID --ide2 $STORAGE:cloudinit
+
+printf "\n** Setting boot and display settings with serial console\n"
+qm set $VMID --boot c --bootdisk scsi0 --serial0 socket --vga serial0
+
+printf "\n** Using a dhcp server on $BRIDGE VLAN $VLANID\n"
+qm set $VMID --ipconfig0 ip=dhcp
+
+
+
