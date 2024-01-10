@@ -11,4 +11,5 @@ Based on Techno Tim Tutorial https://technotim.live/posts/cloud-init-cloud-image
 ## Instructions
 
 Choose your Ubuntu Cloud Image https://cloud-images.ubuntu.com/
+
 Choose your Debian Cloud Image https://cloud.debian.org/images/cloud/
