@@ -32,7 +32,7 @@ case $OSNR in
     VMID_DEFAULT=8200
     read -p "Enter a VM ID for $OSNAME [$VMID_DEFAULT]: " VMID
     VMID=${VMID:-$VMID_DEFAULT}
-    VMIMAGE=debian-12-genericcloud-amd64.qcow2
+    VMIMAGE=debian-12-generic-amd64.qcow2
     NOTE="\n## Default user is 'debian'\n"
     printf "$NOTE\n"
     wget -P /tmp -N https://cloud.debian.org/images/cloud/bookworm/latest/$VMIMAGE
