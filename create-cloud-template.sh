@@ -9,7 +9,7 @@ VLANID=11
 BIOS=ovmf
 MACHINE=q35
 CORE=4
-STORAGE=local-lvm
+STORAGE=fast1
 
 printf "* Available templates to generate:\n 1) Ubuntu Server 22.04 LTS (Jammy Jellyfish)\n 2) Debian 12 (Bokkworm)\n\n"
 read -p "* Enter number of distro to use: " OSNR
@@ -45,22 +45,29 @@ case $OSNR in
 esac
 
 printf "\n** Creating a VM with $MEMORY MB using network bridge $BRIDGE\n"
-qm create $VMID --name $OSNAME-cloud --memory $MEMORY --net0 virtio,bridge=$BRIDGE,trunks=$VLANID --core $CORE --machine $MACHINE --bios $BIOS 
+qm create $VMID --name $OSNAME-cloud --memory $MEMORY --net0 virtio,bridge=$BRIDGE,tag=$VLANID --core $CORE --machine $MACHINE --bios $BIOS 
 
-printf "\n** Importing the disk in qcow2 format (as 'Unused Disk 0')\n"
+printf "\n** Adding an EFI disk (as 'Disk 0')\n"
+qm set $VMID --efidisk0 $STORAGE:0,efitype=4m
+
+printf "\n** Importing the disk in qcow2 format (as 'Unused Disk 1')\n"
 qm importdisk $VMID /tmp/$VMIMAGE $STORAGE
 
 printf "\n** Attaching the disk to the vm using VirtIO SCSI\n"
-qm set $VMID --scsihw virtio-scsi-pci --scsi0 $STORAGE:vm-$VMID-disk-0
+qm set $VMID --scsihw virtio-scsi-pci --scsi0 $STORAGE:vm-$VMID-disk-1,ssd=1
 
 printf "\n** Creating a cloudinit drive managed by Proxmox\n"
 qm set $VMID --ide2 $STORAGE:cloudinit
 
-printf "\n** Setting boot and display settings with serial console\n"
-qm set $VMID --boot c --bootdisk scsi0 --serial0 socket --vga serial0
+printf "\n** Setting boot disk and display settings with serial console\n"
+qm set $VMID --boot c --bootdisk scsi0  --serial0 socket --vga serial0
 
 printf "\n** Using a dhcp server on $BRIDGE VLAN $VLANID\n"
 qm set $VMID --ipconfig0 ip=dhcp
 
-
-
+printf "\n** Add user to cloudinit in GUI\n"
+printf "\n** Add password to cloudinit in GUI\n"
+printf "\n** Add ssh key to cloudinit in GUI\n"
+printf "\n** Convert to a template in GUI\n"
+printf "\n** Create a full clone out of the template in GUI\n"
+printf "\n****** You are done ******\n"
