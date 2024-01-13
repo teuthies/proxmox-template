@@ -59,8 +59,10 @@ qm set $VMID --scsihw virtio-scsi-pci --scsi0 $STORAGE:vm-$VMID-disk-1,ssd=1
 printf "\n** Creating a cloudinit drive managed by Proxmox\n"
 qm set $VMID --ide2 $STORAGE:cloudinit
 
-printf "\n** Setting boot disk and display settings with serial console\n"
-qm set $VMID --boot c --bootdisk scsi0  --serial0 socket --vga serial0
+## printf "\n** Setting boot disk and display settings with serial console\n"
+## qm set $VMID --boot c --bootdisk scsi0  --serial0 socket --vga serial0
+printf "\n** Setting boot disk\n"
+qm set $VMID --boot c --bootdisk scsi0  
 
 printf "\n** Using a dhcp server on $BRIDGE VLAN $VLANID\n"
 qm set $VMID --ipconfig0 ip=dhcp

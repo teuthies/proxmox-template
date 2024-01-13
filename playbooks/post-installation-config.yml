@@ -1,0 +1,30 @@
+- name: configure ubuntu server post installation
+  hosts: "ubuntu"
+  become: yes
+  tasks:
+  
+  - name: task 1 update the server
+    apt:
+        update_cache: yes
+        upgrade: 'yes'
+
+  - name: task 2.1 install automated updates
+  # manual steps for ubuntu https://help.ubuntu.com/community/AutomaticSecurityUpdates 
+    apt:
+        name: unattended-upgrades
+        state: present
+        update_cache: true
+
+  - name: task 2.2 Create unattended upgrades configuration file
+  # from https://luisjohnstone.com/2023/10/ubuntu-unattended-updates-with-ansible.html
+    ansible.builtin.blockinfile:
+        path: /etc/apt/apt.conf.d/20auto-upgrades
+        block: |
+          APT::Periodic::Update-Package-Lists "1";
+          APT::Periodic::Unattended-Upgrade "1";
+        create: true
+        marker: "// {mark} ANSIBLE MANAGED BLOCK - unattended_upgrades settings"
+
+  - name: task 2.3 Reconfigure dpkg 
+    ansible.builtin.command:
+       cmd: dpkg-reconfigure -f noninteractive unattended-upgrades
