@@ -1,21 +1,22 @@
 - name: configure ubuntu server post installation
+# based on Tutorial from Techno Tim https://technotim.live/posts/fist-13-things-linux/
   hosts: "ubuntu"
   become: yes
   tasks:
   
-  - name: task 1 update the server
+  - name: 1 update the server
     apt:
         update_cache: yes
         upgrade: 'yes'
 
-  - name: task 2.1 install automated updates
+  - name: 2.1 install automated updates
   # manual steps for ubuntu https://help.ubuntu.com/community/AutomaticSecurityUpdates 
     apt:
         name: unattended-upgrades
         state: present
         update_cache: true
 
-  - name: task 2.2 Create unattended upgrades configuration file
+  - name: 2.2 Create unattended upgrades configuration file
   # from https://luisjohnstone.com/2023/10/ubuntu-unattended-updates-with-ansible.html
     ansible.builtin.blockinfile:
         path: /etc/apt/apt.conf.d/20auto-upgrades
@@ -23,8 +24,49 @@
           APT::Periodic::Update-Package-Lists "1";
           APT::Periodic::Unattended-Upgrade "1";
         create: true
+        mode: "0644"
+        owner: root
+        group: root
         marker: "// {mark} ANSIBLE MANAGED BLOCK - unattended_upgrades settings"
+    register: unattanded_upgrades_config_set
 
-  - name: task 2.3 Reconfigure dpkg 
+  - name: 2.3 Disable automated reboots
+    ansible.builtin.blockinfile:
+        path: /etc/apt/apt.conf.d/50unattended-upgrades
+        block: |
+          Unattended-Upgrade::Automatic-Reboot "false";
+        create: true
+        mode: "0644"
+        owner: root
+        group: root
+        marker: "// {mark} ANSIBLE MANAGED BLOCK - unattended_upgrades settings"
+    register: unattanded_upgrades_settings_set
+
+  - name: 2.4 Reconfigure dpkg 
     ansible.builtin.command:
        cmd: dpkg-reconfigure -f noninteractive unattended-upgrades
+    when:
+      - unattanded_upgrades_config_set.changed or
+        unattanded_upgrades_settings_set.changed
+
+  - name: 3 Disable Login from root account
+    ansible.builtin.command:
+      cmd: sudo passwd -l root
+
+  - name: 4.1 Disable Password based login for users
+    ansible.builtin.blockinfile:
+        path: /etc/ssh/sshd_config.d/disable_passwd_auth.conf
+        block: |
+          PasswordAuthentication no
+          ChallengeResponseAuthentication no
+        create: true
+        mode: "0644"
+        owner: root
+        group: root
+    register: sshd_settings_set
+
+  - name: 4.2 Restart sshd process
+    ansible.builtin.command:
+      cmd: sudo systemctl restart sshd
+    when:
+      - sshd_settings_set.changed
