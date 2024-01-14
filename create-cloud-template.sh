@@ -67,6 +67,9 @@ qm set $VMID --boot c --bootdisk scsi0
 printf "\n** Using a dhcp server on $BRIDGE VLAN $VLANID\n"
 qm set $VMID --ipconfig0 ip=dhcp
 
+## printf "\n** Enable Qemu Guest Agent\n"
+qm set $VMID --agent enabled=1
+
 printf "\n** Add user to cloudinit in GUI\n"
 printf "\n** Add password to cloudinit in GUI\n"
 printf "\n** Add ssh key to cloudinit in GUI\n"

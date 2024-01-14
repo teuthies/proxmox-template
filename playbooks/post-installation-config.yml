@@ -70,3 +70,61 @@
       cmd: sudo systemctl restart sshd
     when:
       - sshd_settings_set.changed
+  
+# TASK 5 Configure Static IP Address in Cloud Init on Proxmox as well as on the Unifi DHCFP Server 
+
+#  - name: 6.1 Install alternative Shell oh-my-zsh
+#    ansible.builtin.command:
+#      cmd: sudo apt-get install zsh -y
+
+#  - name: 6.2 Install powerline fonts 
+#    ansible.builtin.command:
+#      cmd: sudo apt-get install powerline fonts-powerline -y
+
+#  - name: 6.3 Download ohmyzsh install script 
+#    ansible.builtin.command:
+#      cmd: wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
+
+#  - name: 6.4 Install ohmyzsh by running install script 
+#    ansible.builtin.command:
+#      cmd: bash install.sh --unattended --keep-zshrc --skip-chsh
+
+# Task 7 Check if enough space is available, otherwise increase harddisk size in Proxmox to e.g. 8GB
+# Task 8 Hostname already set by CloudInit
+
+  - name: 9 Set correct timezone Europe/Berlin
+    ansible.builtin.command:
+      cmd: sudo timedatectl set-timezone Europe/Berlin
+
+# Task 10 Setup local NTP Server
+# sudo nano /etc/systemd/timesyncd.conf
+### NTP=192.168.0.4
+# sudo timedatectl set-ntp off
+# sudo timedatectl set-ntp on
+
+  - name: 11 Install Qemu Guest Agent on Virtual Machines
+    ansible.builtin.command:
+      cmd: sudo apt-get install qemu-guest-agent -y
+
+  
+# Task 12 Configure Firewall
+## Please install first by running: ansible-galaxy collection install community.general
+  - name: 12.1 Configure Firewall - Allow all outgoing traffic
+    community.general.ufw:
+      direction: out
+      rule: allow
+
+  - name: 12.2 Configure Firewall - Deny all incomming traffic
+    community.general.ufw:
+      direction: in
+      rule: deny
+  
+  - name: 12.3 Configure Firewall - Allow ssh traffic
+    community.general.ufw:
+      direction: in
+      rule: allow
+      name: OpenSSH
+  
+  - name: 12.4 Enable Firewall
+    community.general.ufw:
+      state: enabled
