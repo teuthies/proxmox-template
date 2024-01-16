@@ -1,0 +1,48 @@
+- name: install and configure Chrony on proxmox server
+  hosts: proxmoxserver
+  remote_user: root
+
+  tasks:
+    - name: install chrony
+      apt:
+        name: chrony
+        state: present
+        update_cache: true
+
+    - name: Copy ntp Server List Config file to Server
+      ansible.builtin.copy:
+        src: /Users/silvio/Documents/Projekte/git/proxmox-template/files/chrony-server/external-ntp-server.sources
+        dest: /etc/chrony/sources.d/
+        owner: root
+        group: root
+        mode: '0644'
+        backup: yes
+
+    - name: Copy chrony configuration to Proxmox Server
+      ansible.builtin.copy:
+        src: /Users/silvio/Documents/Projekte/git/proxmox-template/files/chrony-server/proxmox-server.conf
+        dest: /etc/chrony/conf.d/
+        owner: root
+        group: root
+        mode: '0644'
+        backup: yes
+
+    - name: Comment configuration setting for pool 
+      ansible.builtin.replace:
+        path: /etc/chrony/chrony.conf
+        backup: true
+        regexp: '^pool'
+        replace: '# pool'
+
+    - name: Comment configuration setting for DHCP 
+      ansible.builtin.replace:
+        path: /etc/chrony/chrony.conf
+        backup: true
+        regexp: '^sourcedir \/run\/chrony-dhcp'
+        replace: '# sourcedir /run/chrony-dhcp'
+
+    - name: Ensure chrony is running and enabled on boot
+      service:
+        name: chrony
+        state: restarted
+        enabled: yes

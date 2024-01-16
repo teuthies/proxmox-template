@@ -1,9 +1,7 @@
-server ptbtime1.ptb.de iburst
-server ptbtime2.ptb.de iburst
-server ptbtime3.ptb.de iburst
-server time.desy.de iburst
+# server ptbtime1.ptb.de iburst
+# server ptbtime2.ptb.de iburst
+# server ptbtime3.ptb.de iburst
+# server ptbtime4.ptb.de iburst
+server ntp.desy.de iburst
 server ntp2.desy.de iburst
 server ntp3.desy.de iburst
-server ntp.rz.tu-harburg.de iburst
-server ntp2.informatik.uni-rostock.de iburst
-server ntp0.ewetel.de iburst
