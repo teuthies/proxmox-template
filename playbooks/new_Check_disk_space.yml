@@ -1,0 +1,32 @@
+---
+- hosts: your_host
+  gather_facts: yes
+  tasks:
+    - name: Create disk space check script
+      copy:
+        dest: "/usr/local/bin/check_disk_space.sh"
+        mode: 0755
+        content: |
+          #!/bin/bash
+
+          # Set the warning level in percent
+          WARNING_LEVEL=80
+
+          # Get the current disk usage
+          DISK_USAGE=$(df / | tail -1 | awk '{print $5}' | sed 's/%//')
+
+          # Get the hostname
+          HOSTNAME=$(hostname)
+
+          if [ "$DISK_USAGE" -gt "$WARNING_LEVEL" ]
+          then
+              # Send an email alert
+              echo "Warning: Disk usage on $HOSTNAME has exceeded $WARNING_LEVEL%. Current usage is $DISK_USAGE%." | mail -s "Disk Space Warning on $HOSTNAME" your-email@example.com
+          fi
+
+    - name: Add cron job for disk space check script
+      cron:
+        name: "Check disk space"
+        minute: "0"
+        hour: "0"
+        job: "/usr/local/bin/check_disk_space.sh"
