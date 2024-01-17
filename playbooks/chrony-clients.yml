@@ -1,0 +1,43 @@
+- name: install and configure Chrony on ubuntu clients
+  hosts: ubuntu
+
+  tasks:
+    - name: install chrony
+      apt:
+        name: chrony
+        state: present
+        update_cache: true
+      become: true
+
+    - name: Copy ntp Server List Config file to Server
+      ansible.builtin.copy:
+        src: /Users/silvio/Documents/Projekte/git/proxmox-template/files/chrony-server/internal-ntp-server.sources
+        dest: /etc/chrony/sources.d/
+        owner: root
+        group: root
+        mode: '0644'
+        backup: yes
+      become: true
+
+    - name: Comment configuration setting for pool 
+      ansible.builtin.replace:
+        path: /etc/chrony/chrony.conf
+        backup: true
+        regexp: '^pool'
+        replace: '# pool'
+      become: true
+
+    - name: Comment configuration setting for DHCP 
+      ansible.builtin.replace:
+        path: /etc/chrony/chrony.conf
+        backup: true
+        regexp: '^sourcedir \/run\/chrony-dhcp'
+        replace: '# sourcedir /run/chrony-dhcp'
+      become: true
+
+    - name: Ensure chrony is running and enabled on boot
+      service:
+        name: chrony
+        state: restarted
+        enabled: yes
+      become: true
