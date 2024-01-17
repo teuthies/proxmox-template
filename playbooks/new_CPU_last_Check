@@ -1,0 +1,32 @@
+---
+- hosts: your_host
+  gather_facts: yes
+  tasks:
+    - name: Create CPU usage check script
+      copy:
+        dest: "/usr/local/bin/check_cpu_usage.sh"
+        mode: 0755
+        content: |
+          #!/bin/bash
+
+          # Set the warning level in percent
+          WARNING_LEVEL=80
+
+          # Get the current CPU usage
+          CPU_USAGE=$(top -bn1 | grep "Cpu(s)" | sed "s/.*, *\([0-9.]*\)%* id.*/\1/" | awk '{print 100 - $1}')
+
+          # Get the hostname
+          HOSTNAME=$(hostname)
+
+          if (( $(echo "$CPU_USAGE > $WARNING_LEVEL" | bc -l) ))
+          then
+              # Send an email alert
+              echo "Warning: CPU usage on $HOSTNAME has exceeded $WARNING_LEVEL%. Current usage is $CPU_USAGE%." | mail -s "CPU Usage Warning on $HOSTNAME" your-email@example.com
+          fi
+
+    - name: Add cron job for CPU usage check script
+      cron:
+        name: "Check CPU usage"
+        minute: "0"
+        hour: "*"
+        job: "/usr/local/bin/check_cpu_usage.sh"
