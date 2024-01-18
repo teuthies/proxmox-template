@@ -19,7 +19,7 @@
         backup: yes
       become: true
 
-    - name: Comment configuration setting for pool 
+    - name: Comment configuration setting for pool
       ansible.builtin.replace:
         path: /etc/chrony/chrony.conf
         backup: true
