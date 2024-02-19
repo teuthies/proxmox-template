@@ -1,0 +1,56 @@
+- name: Check if local jail already exists
+  ansible.builtin.stat:
+    path: /etc/fail2ban/jail.local
+  register: jail_local_file
+
+- name: 13.2 Configure jail.conf as local file to survive updates
+  ansible.builtin.copy:
+    src: /etc/fail2ban/jail.conf
+    dest: /etc/fail2ban/jail.local
+    remote_src: true
+    owner: root
+    group: root
+    mode: '0644'
+  when: not jail_local_file.stat.exists
+
+- name: 13.3 Configure bantime in jail.local
+  ansible.builtin.lineinfile:
+    path: /etc/fail2ban/jail.local
+    insertafter: '[DEFAULT]'
+    firstmatch: true
+    regexp: '^bantime\s*=\s*(.*)$'
+    line: bantime = 1440m
+  notify: Restart fail2ban
+
+- name: 13.4 Configure findtime in jail.local
+  ansible.builtin.lineinfile:
+    path: /etc/fail2ban/jail.local
+    insertafter: '[DEFAULT]'
+    firstmatch: true
+    regexp: '^findtime\s*=\s*(.*)$'
+    line: findtime = 60m
+  notify: Restart fail2ban
+
+- name: 13.5 Configure maxretry in jail.local
+  ansible.builtin.lineinfile:
+    path: /etc/fail2ban/jail.local
+    insertafter: '[DEFAULT]'
+    firstmatch: true
+    regexp: '^maxretry\s*=\s*(.*)$'
+    line: maxretry = 3
+  notify: Restart fail2ban
+
+- name: 13.6 Configure backend in jail.local
+  ansible.builtin.lineinfile:
+    path: /etc/fail2ban/jail.local
+    insertafter: '[DEFAULT]'
+    firstmatch: true
+    regexp: '^backend\s*=\s*(.*)$'
+    line: backend = systemd
+  notify: Restart fail2ban
+
+- name: 13.7 Restart Fail2Ban service
+  ansible.builtin.service:
+    name: fail2ban
+    state: started
+    enabled: true

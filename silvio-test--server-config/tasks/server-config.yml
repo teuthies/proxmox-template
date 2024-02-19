@@ -1,0 +1,40 @@
+---
+# name: configure ubuntu server post installation
+# based on Tutorial from Techno Tim https://technotim.live/posts/fist-13-things-linux/
+
+- name: Task 1.1 update the server
+  ansible.builtin.import_tasks: tasks/apt-upgrade.yml
+
+- name: Task 1.2 install essentiall packages
+  ansible.builtin.import_tasks: tasks/apt-install.yml
+
+- name: Task 2 Install and Configure automated updates
+  ansible.builtin.import_tasks: tasks/unattended-upgrade.yml
+
+- name: Task 3 Disable Login from root account
+  ansible.builtin.import_tasks: tasks/disable-root-login.yml
+
+- name: Task 4 Disable Password based login for users
+  ansible.builtin.import_tasks: tasks/disable-password-login.yml
+
+# MANUAL TASK: 5 Configure Static IP Address in Cloud Init on Proxmox as well as on the Unifi DHCFP Server
+
+- name: Task 6 Install alternative Shell oh-my-zsh
+  ansible.builtin.import_tasks: tasks/install-oh-my-zsh
+
+# Task: 7 Check if enough space is available, otherwise increase harddisk size in Proxmox to e.g. 8GB
+# Task: 8 Hostname already set by CloudInit
+
+- name: Task 9 Set correct timezone Europe/Berlin
+  ansible.builtin.import_tasks: tasks/set-timezone.yml
+
+- name: Task 10 Setup local NTP Server
+  ansible.builtin.import_tasks: tasks/set_timeserver_chrony.yml
+
+# Task 11 Install Qemu Guest Agent on Virtual Machines
+
+- name: Task 12 Configure Firewall
+  ansible.builtin.import_tasks: tasks/set-firewall.yml
+
+- name: Task 13 Install and Configure Fail2Ban
+  ansible.builtin.import_tasks: tasks/set-fail2ban.yml

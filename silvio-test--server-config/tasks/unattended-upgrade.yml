@@ -1,0 +1,26 @@
+# manual steps for ubuntu https://help.ubuntu.com/community/AutomaticSecurityUpdates
+# from https://luisjohnstone.com/2023/10/ubuntu-unattended-updates-with-ansible.html
+- name: Create unattended upgrades configuration file
+  ansible.builtin.blockinfile:
+    path: /etc/apt/apt.conf.d/20auto-upgrades
+    block: |
+      APT::Periodic::Update-Package-Lists "1";
+      APT::Periodic::Unattended-Upgrade "1";
+    create: true
+    mode: "0644"
+    owner: root
+    group: root
+    marker: "// {mark} ANSIBLE MANAGED BLOCK - unattended_upgrades settings"
+  notify: Reconfigure unattended upgrades
+
+- name: 2.3 Disable automated reboots
+  ansible.builtin.blockinfile:
+    path: /etc/apt/apt.conf.d/50unattended-upgrades
+    block: |
+      Unattended-Upgrade::Automatic-Reboot "false";
+    create: true
+    mode: "0644"
+    owner: root
+    group: root
+    marker: "// {mark} ANSIBLE MANAGED BLOCK - unattended_upgrades settings"
+  notify: Reconfigure unattended upgrades

@@ -1,0 +1,15 @@
+- name: Make vmbr0 interface vlan aware
+  community.general.interfaces_file:
+    dest: /etc/network/interfaces
+    iface: vmbr0
+    option: bridge-vlan-aware
+    value: "yes"
+    state: present
+
+- name: Configure vmbr0 bridge vlan IDs
+  community.general.interfaces_file:
+    dest: /etc/network/interfaces
+    iface: vmbr0
+    option: bridge-vids
+    value: "2-4094"
+    state: present

@@ -1,0 +1,31 @@
+- name: Copy ntp Server List Config file to Server
+  ansible.builtin.copy:
+    dest: /etc/chrony/sources.d/internal-ntp-server.sources
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      server 192.168.11.21 iburst prefer
+  notify: Restart chrony
+
+- name: Comment configuration setting for pool
+  ansible.builtin.replace:
+    path: /etc/chrony/chrony.conf
+    backup: true
+    regexp: '^pool'
+    replace: '# pool'
+  notify: Restart chrony
+
+- name: Comment configuration setting for DHCP
+  ansible.builtin.replace:
+    path: /etc/chrony/chrony.conf
+    backup: true
+    regexp: '^sourcedir \/run\/chrony-dhcp'
+    replace: '# sourcedir /run/chrony-dhcp'
+  notify: Restart chrony
+
+- name: Ensure chrony is running and enabled on boot
+  ansible.builtin.service:
+    name: chrony
+    state: started
+    enabled: true

@@ -1,0 +1,25 @@
+---
+# Configuration Proxmox Server
+
+- name: Task 1.1 Update Proxmox Sources List without subscription
+  ansible.builtin.import_tasks: tasks/proxmox-source-list.yml
+
+- name: Task 1.2 update the server
+  ansible.builtin.import_tasks: tasks/apt-dist-upgrade.yml
+
+- name: Task 1.3 Remove subscription warning
+  ansible.builtin.import_tasks: tasks/proxmox-no-warning.yml
+
+# 2. Configuring Storage (ZFS-Storage, NAS-NFS-Storage)
+# Create ZFS pool "fast1"
+# Raid-Level: mirror
+# Disks: Micron SSD's 3.83TB
+
+- name: Task 3 Ensure DISK SMART Monitoring
+  ansible.builtin.import_tasks: tasks/proxmox-disk-mon.yml
+
+- name: Task 4 Turn on IOMMU (PCI Passthrough)
+  ansible.builtin.import_tasks: tasks/proxmox-iommu-on.yml
+
+- name: Task 5. Make Proxmox Server VLAN Aware
+  ansible.builtin.import_tasks: tasks/proxmox-vlan-aware.yml

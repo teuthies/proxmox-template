@@ -1,0 +1,5 @@
+- name: Install new packages (apt install)
+  ansible.builtin.apt:
+    update_cache: true
+    name: "{{ packages }}"
+    state: present

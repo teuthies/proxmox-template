@@ -1,0 +1,16 @@
+---
+username: silvio
+packages:
+  - htop
+  - neofetch
+  - speedtest-cli
+  - qemu-guest-agent
+  - iftop
+  - ufw
+  - unattended-upgrades
+  - zsh
+  - powerline
+  - fonts-powerline
+  - git
+  - chrony
+  - fail2ban

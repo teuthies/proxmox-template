@@ -1,0 +1,24 @@
+- name: Ensure DISK SMART Monitoring is enabled on disk sdi.
+  ansible.builtin.command:
+    cmd: smartctl -a /dev/sdi
+  changed_when: false
+  register: smartctl_sdi
+
+- name: Print the registered output of the 'smartctl' command for sdi.
+  ansible.builtin.debug:
+    var: smartctl_sdi.stdout
+
+- name: Ensure DISK SMART Monitoring is enabled on disk sdj.
+  ansible.builtin.command:
+    cmd: smartctl -a /dev/sdj
+  changed_when: false
+
+- name: Ensure DISK SMART Monitoring is enabled on disk sdk.
+  ansible.builtin.command:
+    cmd: smartctl -a /dev/sdk
+  changed_when: false
+
+- name: Ensure DISK SMART Monitoring is enabled on disk sdl.
+  ansible.builtin.command:
+    cmd: smartctl -a /dev/sdl
+  changed_when: false

@@ -1,0 +1,8 @@
+- name: Remove Proxmox Subscription Warning
+  ansible.builtin.copy:
+    src: files/remove-subscription-warning.sh
+    dest: /root/remove-subscription-warning.sh
+    mode: "0744"
+    owner: root
+    group: root
+  notify: Create Cron job for regular execution of shell script

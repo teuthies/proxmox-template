@@ -1,0 +1,4 @@
+- name: Disable Login from root account (lock root password)
+  ansible.builtin.user:
+    name: root
+    password_lock: true

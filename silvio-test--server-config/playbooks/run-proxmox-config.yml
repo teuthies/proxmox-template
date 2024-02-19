@@ -1,0 +1,28 @@
+---
+- name: Rund Proxmox configuration post installation.
+  hosts: proxmox
+  become: true
+
+  tasks:
+    - name: Configuration Proxmox Server
+      ansible.builtin.import_tasks: tasks/proxmox-config.yml
+
+  handlers:
+    - name: Refresh proxmox boot tool
+      ansible.builtin.command:
+        cmd: 'proxmox-boot-tool refresh'
+      register: my_output
+      changed_when: my_output.rc != 0
+
+    - name: Update initramfs
+      ansible.builtin.command:
+        cmd: 'update-initramfs -u -k all'
+      register: my_output
+      changed_when: my_output.rc != 0
+
+    - name: Create Cron job for regular execution of shell script
+      ansible.builtin.cron:
+        name: "Remove Proxmox Subscription Warning"
+        minute: 0
+        hour: 5
+        job: "cd /root; ./remove-subscription-warning.sh"

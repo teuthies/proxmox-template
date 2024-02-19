@@ -1,0 +1,11 @@
+---
+- name: Rund Server Configuration post Installation
+  hosts: all
+  become: true
+
+  roles:
+    - server-config
+
+  handlers:
+    - name: Insert Handlers for Server-config
+      ansible.builtin.import_tasks: handlers/server-config.yml

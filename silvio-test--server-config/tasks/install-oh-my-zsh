@@ -1,0 +1,19 @@
+- name: Check if ohmyzsh is already installed
+  ansible.builtin.stat:
+    path: ~/.zshrc
+  register: zshrc_file
+
+- name: Download ohmyzsh install script 
+  ansible.builtin.command:
+    cmd: wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
+  when: not zshrc_file.stat.exists
+
+- name: Install ohmyzsh by running install script 
+  ansible.builtin.command:
+    cmd: bash install.sh --unattended
+  when: not zshrc_file.stat.exists
+
+- name: Delete ohmyzsh install script 
+  ansible.builtin.command:
+    cmd: rm install.sh
+  when: not zshrc_file.stat.exists
